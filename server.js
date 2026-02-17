@@ -7,10 +7,40 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const API_URL = "https://router.huggingface.co/v1/chat/completions";
+const API_URL =
+  "https://router.huggingface.co/hf-inference/models/mistralai/Mistral-7B-Instruct-v0.2";
+
+const SYSTEM_PROMPT = `
+Ти AI асистент сайту KinoArea.
+
+Твої задачі:
+- допомагати з фільмами
+- рекомендувати кіно
+- відповідати коротко
+- писати українською
+- не говорити що ти не маєш доступу до інтернету
+- не пояснювати як ти працюєш
+
+Якщо просять список — давай список.
+`;
 
 app.post("/ai", async (req, res) => {
   try {
+    const { message, userMovies } = req.body;
+
+    const userContext = userMovies?.length
+      ? `Улюблені фільми користувача: ${userMovies.join(", ")}`
+      : "";
+
+    const prompt = `
+${SYSTEM_PROMPT}
+
+${userContext}
+
+Користувач: ${message}
+Асистент:
+`;
+
     const response = await fetch(API_URL, {
       method: "POST",
       headers: {
@@ -18,19 +48,28 @@ app.post("/ai", async (req, res) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "mistralai/Mistral-7B-Instruct-v0.2",
-        messages: [
-          {
-            role: "user",
-            content: req.body.message,
-          },
-        ],
+        inputs: prompt,
+        parameters: {
+          max_new_tokens: 300,
+          temperature: 0.7,
+        },
       }),
     });
 
-    const data = await response.json();
+    const text = await response.text();
 
-    res.json(data);
+    if (!response.ok) {
+      console.error("HF ERROR:", text);
+      return res.status(500).json({ error: text });
+    }
+
+    const data = JSON.parse(text);
+
+    const aiMessage =
+      data?.[0]?.generated_text?.replace(prompt, "") ||
+      "Сталася помилка генерації";
+
+    res.json({ message: aiMessage });
 
   } catch (err) {
     console.error("SERVER ERROR:", err);
