@@ -8,7 +8,7 @@ app.use(cors());
 app.use(express.json());
 
 const API_URL =
-  "https://router.huggingface.co/hf-inference/models/HuggingFaceH4/zephyr-7b-beta";
+  "https://api-inference.huggingface.co/models/HuggingFaceH4/zephyr-7b-beta";
 
 
 const SYSTEM_PROMPT = `
