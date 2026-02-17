@@ -8,7 +8,8 @@ app.use(cors());
 app.use(express.json());
 
 const API_URL =
-  "https://router.huggingface.co/hf-inference/models/mistralai/Mistral-7B-Instruct-v0.2";
+  "https://router.huggingface.co/hf-inference/models/HuggingFaceH4/zephyr-7b-beta";
+
 
 const SYSTEM_PROMPT = `
 Ти AI асистент сайту KinoArea.
