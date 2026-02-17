@@ -7,8 +7,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const API_URL =
-  "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2";
+const API_URL = "https://router.huggingface.co/v1/chat/completions";
 
 app.post("/ai", async (req, res) => {
   try {
@@ -19,18 +18,17 @@ app.post("/ai", async (req, res) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        inputs: req.body.message,
+        model: "mistralai/Mistral-7B-Instruct-v0.2",
+        messages: [
+          {
+            role: "user",
+            content: req.body.message,
+          },
+        ],
       }),
     });
 
-    const text = await response.text();
-
-    if (!response.ok) {
-      console.error("HF ERROR RESPONSE:", text);
-      return res.status(500).json({ error: text });
-    }
-
-    const data = JSON.parse(text);
+    const data = await response.json();
 
     res.json(data);
 
