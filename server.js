@@ -8,7 +8,7 @@ app.use(cors());
 app.use(express.json());
 
 const API_URL =
-  "https://router.huggingface.co/hf-inference/models/mistralai/Mistral-7B-Instruct-v0.2";
+  "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2";
 
 app.post("/ai", async (req, res) => {
   try {
