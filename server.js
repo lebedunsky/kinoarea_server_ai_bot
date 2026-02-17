@@ -28,6 +28,7 @@ app.post("/ai", async (req, res) => {
     const data = await response.json();
     res.json(data);
   } catch (err) {
+    console.error("HF ERROR:", err); 
     res.status(500).json({ error: "AI request failed" });
   }
 });
