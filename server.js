@@ -1,16 +1,14 @@
 import express from "express";
 import fetch from "node-fetch";
 import cors from "cors";
-import dotenv from "dotenv";
-
-dotenv.config();
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-const API_URL = "https://router.huggingface.co/hf-inference/models/gpt2";
+const API_URL =
+  "https://router.huggingface.co/hf-inference/models/mistralai/Mistral-7B-Instruct-v0.2";
 
 app.post("/ai", async (req, res) => {
   try {
@@ -25,14 +23,22 @@ app.post("/ai", async (req, res) => {
       }),
     });
 
-    const data = await response.json();
+    const text = await response.text();
+
+    if (!response.ok) {
+      console.error("HF ERROR RESPONSE:", text);
+      return res.status(500).json({ error: text });
+    }
+
+    const data = JSON.parse(text);
+
     res.json(data);
+
   } catch (err) {
-    console.error("HF ERROR:", err); 
+    console.error("SERVER ERROR:", err);
     res.status(500).json({ error: "AI request failed" });
   }
 });
 
-app.listen(3001, () => {
-  console.log("AI server running on http://localhost:3001");
-});
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => console.log("Server running on", PORT));
