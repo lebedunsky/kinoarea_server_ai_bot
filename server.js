@@ -20,11 +20,29 @@ app.post("/ai", async (req, res) => {
       body: JSON.stringify({
         model: "mistralai/Mistral-7B-Instruct-v0.2",
         messages: [
-          {
-            role: "user",
-            content: req.body.message,
-          },
-        ],
+    {
+      role: "system",
+      content: `
+Ти AI-помічник кіносайту.
+
+Правила:
+- відповідай коротко (1–3 речення)
+- тільки українською
+- допомагай лише з темою кіно
+- якщо питання не про кіно — відповідай:
+"Я допомагаю лише з питаннями про фільми."
+
+Ти можеш:
+- рекомендувати фільми
+- розповідати про акторів
+- пояснювати жанри
+`
+    },
+    {
+      role: "user",
+      content: req.body.message,
+    },
+  ],
       }),
     });
 
